@@ -25,7 +25,7 @@ public class TotpAuthentication {
     private UserDataDAO userDataDao;
 
     @Value("${totp.encryptionkey}")
-    private String otpEncryptionkey;
+    private String totpEncryptionkey;
 
     public static final String provider = "demoapp";
 
@@ -56,7 +56,7 @@ public class TotpAuthentication {
     public BufferedImage otpRegister(UserData userData) {
 
         TotpCredentialService tcs = TotpCredentialService.getInstance();
-        TotpCredential cred = tcs.createCredential(userData.getUserId(), provider, otpEncryptionkey);
+        TotpCredential cred = tcs.createCredential(userData.getUserId(), provider, totpEncryptionkey);
 
         userData.setUserEncryptedSecret(cred.getEncrytedSecret());
         // userData.setUserEncryptionKey(cred.getEncryptionKey());
@@ -83,6 +83,6 @@ public class TotpAuthentication {
 
     public boolean isPasscodeValid(String encrpytedSecret, String passcode){
         
-        return TotpPasscodeValidation.isPasscodeValid(otpEncryptionkey, encrpytedSecret, passcode);
+        return TotpPasscodeValidation.isPasscodeValid(encrpytedSecret, totpEncryptionkey, passcode);
     }
 }
