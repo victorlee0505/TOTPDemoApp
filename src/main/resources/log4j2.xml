@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT" >
+            <Filters>
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+            <PatternLayout pattern="%d R=%r %-5p [%t] [%marker] %X %c.%M:%L - %m%n" />
+        </Console>
+
+        <RollingFile name="DAILY_LOG" fileName="logs/TOTPDemo.log" filePattern="logs/TOTPDemo_%d{yyyyMMdd}_%i.log">
+            <PatternLayout>
+                <pattern>%d R=%r %-5p [%t] [%marker] %X %c.%M:%L - %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="512 MB" />
+                <TimeBasedTriggeringPolicy interval="1" />
+                <OnStartupTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="300"/>
+        </RollingFile>
+
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout   pattern="%d R=%r %-5p [%t] [%marker] %X %c.%M:%L - %m%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="trace" >
+            <AppenderRef ref="STDOUT" />
+            <AppenderRef ref="DAILY_LOG" />
+        </Root>
+
+    </Loggers>
+</Configuration>
