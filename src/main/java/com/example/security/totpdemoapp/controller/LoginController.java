@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @Value("${totp.enable: false}")
-    private Boolean optEnable;
+    private Boolean toptEnable;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -61,7 +61,7 @@ public class LoginController {
                     response.put("message", "Logon");
 
                     // OTP process
-                    if (optEnable) {
+                    if (toptEnable) {
                         if (StringUtils.isNotBlank(userData.getUserEncryptedSecret())) {
                             // Passcode
                             response.put("otp", "passcode");
