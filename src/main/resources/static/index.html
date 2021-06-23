@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        #passcode, #qrcode {
+            margin: auto;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 400px;
+            text-align: center;
+            background-color: lightblue;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body onload="initialize()">
+
+    <h1> Login Portal </h1>
+
+    <div>
+    <form id="loginForm">
+        <label for="userId">Username:</label>
+        <input type="text" id="userId" name="userId" placeholder="Enter Username"><br><br>
+        <label for="userPassword">Password:</label>
+        <input type="text" id="userPassword" name="userPassword" placeholder="Enter Password"><br><br>
+        <button type='button' id="login-btn" onclick="login()">Login</button>
+    </form>
+    </div>
+
+    <div>
+        <p id="response"></p>
+        <button id="user-btn" onclick="users()">Show Users</button>
+        <a href="http://localhost:8080/register.html">
+            <button id="user-btn" onclick="register()">New Account</button>
+        </a>
+    </div>
+
+    <div id="passcode">
+        <form id="passcodeForm">
+            <label for="pcode">Passcode:</label>
+            <input type="text" id="code" name="code" placeholder="Enter Passcode">
+            <p id="pcstatus"></p>
+            <button type='button' id="code-btn" onclick="passcode()">Submit</button>
+        </form>
+    </div>
+
+    <div id="qrcode">
+        <p>Please scan QRCode with authenticator app</p>
+        <img id="imgqr" src="">
+        <button type='button' id="qr-btn" onclick="qrcode()">Get QRCode</button>
+        <button type='button' id="finishqr-btn" onclick="closeqr()">Finish</button>
+    </div>
+
+
+<script>
+
+function initialize() {
+    var x = document.getElementById("passcode");
+    x.style.display = "none";
+    x = document.getElementById("qrcode");
+    x.style.display = "none";
+    
+}
+
+function users()
+    {
+        fetch(
+            'http://localhost:8080/api/users',
+            { method: 'GET' }
+        )
+        .then( response => response.json() )
+        .then( json => document.getElementById('response').innerHTML = JSON.stringify(json) )
+        .catch( error => console.error('error:', error) );
+    }
+
+function login()
+    {
+        const thisForm = document.getElementById('loginForm');
+        const formData = new FormData(thisForm).entries();
+
+        fetch(
+            'http://localhost:8080/api/login',
+            { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData))
+            }
+        )
+        .then( response => response.json() )
+        .then( json => {
+                            document.getElementById('response').innerHTML = JSON.stringify(json);
+                            otp = json.otp;
+                            console.log(otp);
+                            var x = document.getElementById(otp);
+                            console.log(x.style.display);
+                                if (x.style.display === "none") {
+                                    x.style.display = "block";
+                                } else {
+                                    x.style.display = "none";
+                                }
+                        }   
+        )
+        .catch( error => console.error('error:', error) );
+    }
+
+    function qrcode()
+    {
+        const thisForm = document.getElementById('loginForm');
+        const formData = new FormData(thisForm).entries();
+
+        fetch(
+            'http://localhost:8080/api/qrcode',
+            { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData))
+            }
+        )
+        .then( response => response.json() )
+        .then( json => document.getElementById("imgqr").src = "data:image/png;base64," + json.image )
+        .catch( error => console.error('error:', error) );
+    }
+
+    function passcode()
+    {
+        const loginForm = document.getElementById('loginForm');
+        const loginData = new FormData(loginForm).entries();
+        var loginObj = Object.fromEntries(loginData);
+        var loginStr = JSON.stringify(loginObj);
+        var loginJson = JSON.parse(loginStr)
+        var userId = loginJson.userId
+
+        const pcForm = document.getElementById('passcodeForm');
+        const pcData = new FormData(pcForm).entries();
+        var pObj = Object.fromEntries(pcData);
+        var pStr = JSON.stringify(pObj);
+        var pJson = JSON.parse(pStr)
+        var passcode = pJson.code
+
+        var formData = new FormData();
+        formData.append('userId', userId);
+        formData.append('passcode', passcode);
+
+        console.log(JSON.stringify(Object.fromEntries(formData)));
+
+
+        fetch(
+            'http://localhost:8080/api/passcode',
+            { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData))
+            }
+        )
+        .then( response => response.json() )
+        .then( json => {
+                    if(json.Status == "Success"){
+                        document.getElementById("pcstatus").innerHTML = json.message;
+                        document.getElementById("response").innerHTML = "Login and Passcode successed, " + json.message;;
+                        closepc();
+                    } else {
+                        document.getElementById("pcstatus").innerHTML = json.message;
+                    }
+                    console.log(json);
+                }
+            )
+        .catch( error => console.error('error:', error) );
+    }
+
+    function closeqr()
+    {
+        var x = document.getElementById('qrcode');
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function closepc()
+    {
+        var x = document.getElementById('passcode');
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+
+</script>
+
+
+</body>
+</html>

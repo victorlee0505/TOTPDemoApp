@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+    <h1> New account registration </h1>
+
+    <div>
+    <form id="loginForm">
+        <label for="userId">Username:</label>
+        <input type="text" id="userId" name="userId" placeholder="Enter Username"><br><br>
+        <label for="userPassword">Password:</label>
+        <input type="text" id="userPassword" name="userPassword" placeholder="Enter Password"><br><br>
+        <button type='button' id="login-btn" onclick="register()">Register</button>
+    </form>
+    </div>
+
+    <div>
+        <p id="response"></p>
+
+        <a href="http://localhost:8080">
+            <button id="home-btn">Back to Login Portal</button>
+        </a>
+    </div>
+
+
+<script>
+
+function register()
+    {
+        const thisForm = document.getElementById('loginForm');
+        const formData = new FormData(thisForm).entries();
+
+        fetch(
+            'http://localhost:8080/api/register',
+            { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.fromEntries(formData))
+            }
+        )
+        .then( response => response.json() )
+        .then( json => document.getElementById('response').innerHTML = JSON.stringify(json) )
+        .catch( error => console.error('error:', error) );
+    }
+
+</script>
+
+
+</body>
+</html>
